@@ -95,21 +95,6 @@ st.subheader("🗺️ Live Monitored Flight Routes")
 
 fig = go.Figure()
 
-# Plot all known airports as markers
-lats = [coords["lat"] for coords in AIRPORT_COORDS.values()]
-lons = [coords["lon"] for coords in AIRPORT_COORDS.values()]
-texts = [f"{code} - {coords['name']}" for code, coords in AIRPORT_COORDS.items()]
-
-fig.add_trace(go.Scattergeo(
-    locationmode='country names',
-    lon=lons,
-    lat=lats,
-    hoverinfo='text',
-    text=texts,
-    mode='markers',
-    marker=dict(size=8, color='crimson', line=dict(width=1, color='white'))
-))
-
 # Plot lines for active routes in the database
 active_routes = fares_df[["origin", "destination"]].drop_duplicates()
 for _, row in active_routes.iterrows():
@@ -117,35 +102,54 @@ for _, row in active_routes.iterrows():
     dest = row["destination"]
     
     if orig in AIRPORT_COORDS and dest in AIRPORT_COORDS:
+        # Get latest CPI/Fare data for this route for the hover text
+        route_data = fares_df[(fares_df["origin"] == orig) & (fares_df["destination"] == dest)]
+        latest_date = route_data["observed_at_ist"].dt.date.max()
+        curr_price = route_data[route_data["observed_at_ist"].dt.date == latest_date]["price"].mean()
+        
         fig.add_trace(
-            go.Scattergeo(
-                locationmode='country names',
+            go.Scattermap(
+                mode="lines",
                 lon=[AIRPORT_COORDS[orig]["lon"], AIRPORT_COORDS[dest]["lon"]],
                 lat=[AIRPORT_COORDS[orig]["lat"], AIRPORT_COORDS[dest]["lat"]],
-                mode='lines',
-                line=dict(width=2, color='rgba(0, 100, 255, 0.6)'),
+                line=dict(width=2.5, color='#00d4ff'), # Glowing cyan airline route
                 hoverinfo='text',
-                text=f"Route: {orig} ✈️ {dest}"
+                text=f"<b>Route:</b> {orig} ✈️ {dest}<br><b>Current Avg:</b> ₹{curr_price:,.0f}",
+                name=f"{orig}-{dest}"
             )
         )
 
+# Plot all known airports as markers with visible city labels
+lats = [coords["lat"] for coords in AIRPORT_COORDS.values()]
+lons = [coords["lon"] for coords in AIRPORT_COORDS.values()]
+city_names = [coords['name'] for coords in AIRPORT_COORDS.values()]
+hover_texts = [f"{code} Airport" for code in AIRPORT_COORDS.keys()]
+
+fig.add_trace(go.Scattermap(
+    mode="markers+text",
+    lon=lons,
+    lat=lats,
+    hoverinfo='text',
+    hovertext=hover_texts,
+    text=city_names,
+    textposition="top center",
+    textfont=dict(color="black", size=18, family="Arial Black, sans-serif"),
+    marker=dict(size=18, color='red', opacity=1.0),
+    name="Airports"
+))
+
 fig.update_layout(
-    title_text='AirPrice India Monitored Sectors',
+    margin=dict(l=0, r=0, t=0, b=0),
+    height=600,
     showlegend=False,
-    geo=dict(
-        scope='asia',
-        center=dict(lat=22.0, lon=79.0),  # Center on India
-        projection_type='mercator',
-        showland=True,
-        landcolor='rgb(243, 243, 243)',
-        countrycolor='rgb(204, 204, 204)',
-        coastlinecolor='rgb(204, 204, 204)',
-        lataxis=dict(range=[7, 36]),      # Crop to India latitude
-        lonaxis=dict(range=[67, 98]),     # Crop to India longitude
-        bgcolor='rgba(0,0,0,0)'
+    map=dict(
+        style="open-street-map",  # Bright, detailed, and highly visible base map
+        center=dict(lat=21.0, lon=78.0),
+        zoom=3.8,
+        pitch=0,
     ),
-    margin=dict(l=0, r=0, t=40, b=0),
-    height=500
+    paper_bgcolor='rgba(0,0,0,0)',
+    plot_bgcolor='rgba(0,0,0,0)'
 )
 
 st.plotly_chart(fig, use_container_width=True)
@@ -295,7 +299,35 @@ with cpi_col2:
         st.dataframe(display_df, use_container_width=True, hide_index=True)
 
         st.markdown("**Route CPI Bar Chart:**")
-        st.bar_chart(nat_df.set_index("route")["CPI"], y_label="CPI Value")
+        import plotly.express as px
+        
+        # Professional color-coded bar chart based on inflation (CPI > 100 = Red, CPI < 100 = Green)
+        fig_bar = px.bar(
+            nat_df,
+            x="route",
+            y="CPI",
+            color="CPI",
+            color_continuous_scale="RdYlGn_r",
+            color_continuous_midpoint=100,
+            text="CPI",
+            labels={"route": "Flight Sector", "CPI": "CPI Value (100 = Base Price)"}
+        )
+        fig_bar.update_traces(texttemplate='%{text:.1f}', textposition='outside', marker_line_width=1, marker_line_color='black')
+        
+        # Set y-axis range to emphasize changes around 100
+        min_y = min(90, nat_df["CPI"].min() - 5)
+        max_y = max(110, nat_df["CPI"].max() + 10)
+        
+        fig_bar.update_layout(
+            yaxis=dict(range=[min_y, max_y]),
+            coloraxis_colorbar=dict(title="Inflation Scale"),
+            margin=dict(t=20, b=20)
+        )
+        
+        # Add a baseline at 100 to clearly show inflation vs deflation
+        fig_bar.add_hline(y=100, line_dash="dash", line_color="white", annotation_text="Base Price (100)", annotation_position="bottom right")
+        
+        st.plotly_chart(fig_bar, use_container_width=True)
 
         if nat_delta > 0.01:
             st.error(f"🔴 National airfare is {nat_delta:.2f}% ABOVE the base period — overall inflation signal.")

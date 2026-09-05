@@ -55,6 +55,8 @@ def main():
     schedule.every().day.at("04:00").do(run_data_pipeline)
     schedule.every().day.at("12:00").do(run_data_pipeline)
     schedule.every().day.at("19:00").do(run_data_pipeline)
+    schedule.every().day.at("20:00").do(run_data_pipeline)
+    schedule.every().day.at("23:00").do(run_data_pipeline)
     
     # Calculate the very next run time for logging
     next_run = min(job.next_run for job in schedule.jobs)

@@ -6,7 +6,9 @@ on:
     # 04:00 IST = 22:30 UTC
     # 12:00 IST = 06:30 UTC
     # 19:00 IST = 13:30 UTC
-    - cron: '30 22,6,13 * * *'
+    # 20:00 IST = 14:30 UTC
+    # 23:00 IST = 17:30 UTC
+    - cron: '30 22,6,13,14,17 * * *'
   
   # Allow running manually from the Actions tab
   workflow_dispatch:
