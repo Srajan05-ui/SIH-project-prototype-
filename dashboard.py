@@ -74,8 +74,85 @@ if fares_df.empty:
 fares_df["route"] = fares_df["origin"] + " → " + fares_df["destination"]
 routes = sorted(fares_df["route"].unique())
 
+import plotly.graph_objects as go
+
 # ─────────────────────────────────────────────────────────────────────────────
-# SECTION 1: Index + Fare Trend
+# MAP COORDINATES
+# ─────────────────────────────────────────────────────────────────────────────
+AIRPORT_COORDS = {
+    "DEL": {"lat": 28.5562, "lon": 77.1000, "name": "New Delhi"},
+    "BOM": {"lat": 19.0896, "lon": 72.8656, "name": "Mumbai"},
+    "BLR": {"lat": 13.1986, "lon": 77.7066, "name": "Bengaluru"},
+    "HYD": {"lat": 17.2403, "lon": 78.4294, "name": "Hyderabad"},
+    "CCU": {"lat": 22.6520, "lon": 88.4467, "name": "Kolkata"},
+    "MAA": {"lat": 12.9941, "lon": 80.1709, "name": "Chennai"},
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 1: Interactive Route Map
+# ─────────────────────────────────────────────────────────────────────────────
+st.subheader("🗺️ Live Monitored Flight Routes")
+
+fig = go.Figure()
+
+# Plot all known airports as markers
+lats = [coords["lat"] for coords in AIRPORT_COORDS.values()]
+lons = [coords["lon"] for coords in AIRPORT_COORDS.values()]
+texts = [f"{code} - {coords['name']}" for code, coords in AIRPORT_COORDS.items()]
+
+fig.add_trace(go.Scattergeo(
+    locationmode='country names',
+    lon=lons,
+    lat=lats,
+    hoverinfo='text',
+    text=texts,
+    mode='markers',
+    marker=dict(size=8, color='crimson', line=dict(width=1, color='white'))
+))
+
+# Plot lines for active routes in the database
+active_routes = fares_df[["origin", "destination"]].drop_duplicates()
+for _, row in active_routes.iterrows():
+    orig = row["origin"]
+    dest = row["destination"]
+    
+    if orig in AIRPORT_COORDS and dest in AIRPORT_COORDS:
+        fig.add_trace(
+            go.Scattergeo(
+                locationmode='country names',
+                lon=[AIRPORT_COORDS[orig]["lon"], AIRPORT_COORDS[dest]["lon"]],
+                lat=[AIRPORT_COORDS[orig]["lat"], AIRPORT_COORDS[dest]["lat"]],
+                mode='lines',
+                line=dict(width=2, color='rgba(0, 100, 255, 0.6)'),
+                hoverinfo='text',
+                text=f"Route: {orig} ✈️ {dest}"
+            )
+        )
+
+fig.update_layout(
+    title_text='AirPrice India Monitored Sectors',
+    showlegend=False,
+    geo=dict(
+        scope='asia',
+        center=dict(lat=22.0, lon=79.0),  # Center on India
+        projection_type='mercator',
+        showland=True,
+        landcolor='rgb(243, 243, 243)',
+        countrycolor='rgb(204, 204, 204)',
+        coastlinecolor='rgb(204, 204, 204)',
+        lataxis=dict(range=[7, 36]),      # Crop to India latitude
+        lonaxis=dict(range=[67, 98]),     # Crop to India longitude
+        bgcolor='rgba(0,0,0,0)'
+    ),
+    margin=dict(l=0, r=0, t=40, b=0),
+    height=500
+)
+
+st.plotly_chart(fig, use_container_width=True)
+st.divider()
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 2: Index + Fare Trend
 # ─────────────────────────────────────────────────────────────────────────────
 col1, col2 = st.columns([1, 2])
 
