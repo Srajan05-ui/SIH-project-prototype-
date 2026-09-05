@@ -1,0 +1,18 @@
+# SIH26056 — collector dependencies (Stages 1-2)
+fast-flights>=2.2
+curl_cffi>=0.7
+pdfplumber>=0.11
+pandas>=2.0
+python-dateutil>=2.8
+SQLAlchemy>=2.0
+psycopg2-binary>=2.9    # required for Stages 3-6 (Postgres); optional for Stage 1/2 CSV mode
+tenacity>=8.2             # retry/backoff
+python-dotenv>=1.0
+
+# Hackathon prototype additions (Stages 3-6)
+scikit-learn>=1.4          # optional, anomaly.py IsolationForest path only
+streamlit>=1.35              # Stage 6 dashboard
+fastapi>=0.111                 # Stage 6 API
+uvicorn>=0.29                    # Stage 6 API server
+plotly>=5.20                       # optional, nicer dashboard charts
+schedule>=1.2.0                    # Smart Automation scheduling

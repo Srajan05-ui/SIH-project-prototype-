@@ -1,0 +1,63 @@
+name: AirPrice India Smart Scraper
+
+on:
+  schedule:
+    # GitHub Actions uses UTC time. IST is UTC+5:30.
+    # 04:00 IST = 22:30 UTC
+    # 12:00 IST = 06:30 UTC
+    # 19:00 IST = 13:30 UTC
+    - cron: '30 22,6,13 * * *'
+  
+  # Allow running manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  scrape_and_process:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Start Mock Airline API (Background)
+      run: |
+        # Start the local mock API on port 8000 so Tier 0 and Tier 2 can hit it
+        uvicorn api:app --port 8000 &
+        # Give it a few seconds to start up
+        sleep 5
+
+    - name: Run Collector Tier 1 (Google Flights)
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      run: python collector_tier1.py
+
+    - name: Run Collector Tier 0 (DGCA Mock)
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      run: python collector_tier0_dgca.py
+
+    - name: Run Collector Tier 2 (Airline Direct Mock)
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      run: python collector_tier2_airline.py
+
+    - name: Run Stage 3 (Cleaning)
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      run: python cleaning.py
+
+    - name: Run Stage 4 (Index Calculation)
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      run: python index_calc.py
