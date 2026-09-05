@@ -2,13 +2,13 @@ name: AirPrice India Smart Scraper
 
 on:
   schedule:
-    # GitHub Actions uses UTC time. IST is UTC+5:30.
-    # 04:00 IST = 22:30 UTC
-    # 12:00 IST = 06:30 UTC
-    # 19:00 IST = 13:30 UTC
-    # 20:00 IST = 14:30 UTC
-    # 23:00 IST = 17:30 UTC
-    - cron: '30 22,6,13,14,17 * * *'
+    # Scheduled 30 minutes early to account for GitHub free-tier cron delays
+    # Target 04:00 IST -> Trigger 03:30 IST = 22:00 UTC
+    # Target 12:00 IST -> Trigger 11:30 IST = 06:00 UTC
+    # Target 19:00 IST -> Trigger 18:30 IST = 13:00 UTC
+    # Target 20:00 IST -> Trigger 19:30 IST = 14:00 UTC
+    # Target 23:00 IST -> Trigger 22:30 IST = 17:00 UTC
+    - cron: '0 22,6,13,14,17 * * *'
   
   # Allow running manually from the Actions tab
   workflow_dispatch:

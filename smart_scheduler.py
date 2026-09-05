@@ -52,11 +52,12 @@ def main():
     
     # --- PRODUCTION SCHEDULE ---
     # Run the pipeline three times a day as requested: 4 AM, 12 PM, and 7 PM.
-    schedule.every().day.at("04:00").do(run_data_pipeline)
-    schedule.every().day.at("12:00").do(run_data_pipeline)
-    schedule.every().day.at("19:00").do(run_data_pipeline)
-    schedule.every().day.at("20:00").do(run_data_pipeline)
-    schedule.every().day.at("23:00").do(run_data_pipeline)
+    # Schedule 5 minutes early so data is ready EXACTLY on the hour
+    schedule.every().day.at("03:55").do(run_data_pipeline)
+    schedule.every().day.at("11:55").do(run_data_pipeline)
+    schedule.every().day.at("18:55").do(run_data_pipeline)
+    schedule.every().day.at("19:55").do(run_data_pipeline)
+    schedule.every().day.at("22:55").do(run_data_pipeline)
     
     # Calculate the very next run time for logging
     next_run = min(job.next_run for job in schedule.jobs)
