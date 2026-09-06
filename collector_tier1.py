@@ -65,6 +65,7 @@ def _query_google_flights(origin: str, destination: str, departure_date: date):
             passengers=Passengers(
                 adults=config.ADULTS, children=0, infants_in_seat=0, infants_on_lap=0
             ),
+            currency="INR",
         )
         result = get_flights(query)
     except Exception as exc:  # noqa: BLE001 - we deliberately convert to FetchError for retry
