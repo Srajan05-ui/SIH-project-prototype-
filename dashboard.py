@@ -1,5 +1,5 @@
 """
-Stage 6 — dashboard with CPI Calculator.
+Stage 6 â€” dashboard with CPI Calculator.
 
 Run with:
     streamlit run dashboard.py
@@ -12,8 +12,8 @@ from sqlalchemy import text
 
 from db import get_engine
 
-st.set_page_config(page_title="AirPrice India — Prototype", layout="wide")
-st.title("✈️ AirPrice India — Airfare Index Prototype")
+st.set_page_config(page_title="AirPrice India â€” Prototype", layout="wide")
+st.title("âœˆï¸ AirPrice India â€” Airfare Index Prototype")
 st.caption(
     "SIH26056 internal hackathon prototype. Route-level index only; "
     "see docs/PRD_hackathon_prototype.md for scope."
@@ -71,14 +71,14 @@ if fares_df.empty:
     )
     st.stop()
 
-fares_df["route"] = fares_df["origin"] + " → " + fares_df["destination"]
+fares_df["route"] = fares_df["origin"] + " â†’ " + fares_df["destination"]
 routes = sorted(fares_df["route"].unique())
 
 import plotly.graph_objects as go
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # MAP COORDINATES
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 AIRPORT_COORDS = {
     "DEL": {"lat": 28.5562, "lon": 77.1000, "name": "New Delhi"},
     "BOM": {"lat": 19.0896, "lon": 72.8656, "name": "Mumbai"},
@@ -88,10 +88,10 @@ AIRPORT_COORDS = {
     "MAA": {"lat": 12.9941, "lon": 80.1709, "name": "Chennai"},
 }
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # SECTION 1: Interactive Route Map
-# ─────────────────────────────────────────────────────────────────────────────
-st.subheader("🗺️ Live Monitored Flight Routes")
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+st.subheader("ðŸ—ºï¸ Live Monitored Flight Routes")
 
 fig = go.Figure()
 
@@ -114,7 +114,7 @@ for _, row in active_routes.iterrows():
                 lat=[AIRPORT_COORDS[orig]["lat"], AIRPORT_COORDS[dest]["lat"]],
                 line=dict(width=2.5, color='#00d4ff'), # Glowing cyan airline route
                 hoverinfo='text',
-                text=f"<b>Route:</b> {orig} ✈️ {dest}<br><b>Current Avg:</b> ₹{curr_price:,.0f}",
+                text=f"<b>Route:</b> {orig} âœˆï¸ {dest}<br><b>Current Avg:</b> â‚¹{curr_price:,.0f}",
                 name=f"{orig}-{dest}"
             )
         )
@@ -152,12 +152,12 @@ fig.update_layout(
     plot_bgcolor='rgba(0,0,0,0)'
 )
 
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width='stretch')
 st.divider()
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # SECTION 2: Index + Fare Trend
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 col1, col2 = st.columns([1, 2])
 
 with col1:
@@ -166,7 +166,7 @@ with col1:
         st.info("No index computed yet. Run index_calc.py.")
     else:
         latest_idx = index_df.sort_values("computed_at_ist").groupby(["origin", "destination"]).tail(1)
-        latest_idx = latest_idx.assign(route=latest_idx["origin"] + " → " + latest_idx["destination"])
+        latest_idx = latest_idx.assign(route=latest_idx["origin"] + " â†’ " + latest_idx["destination"])
         for _, row in latest_idx.iterrows():
             delta = row["index_value"] - 100.0
             st.metric(row["route"], f"{row['index_value']:.1f}", f"{delta:+.1f} vs base")
@@ -180,27 +180,27 @@ with col2:
     )
     st.line_chart(chart_df, x_label="Booking Window (Days Ahead)", y_label="Average Price (INR)")
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # SECTION 2: Recent Observations Table
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 st.subheader("Recent observations")
 st.dataframe(
     fares_df.sort_values("observed_at_ist", ascending=False)
     .head(50)[["observed_at_ist", "route", "source_tier", "airline", "price", "booking_window_days"]],
-    use_container_width=True,
+    width='stretch',
 )
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # SECTION 3: PRICE BREAKDOWN
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 st.divider()
-st.header("💰 Price Breakdown Analysis")
+st.header("ðŸ’° Price Breakdown Analysis")
 st.markdown("Detailed fare analysis by airline, booking window, and price distribution for any route.")
 
 import plotly.express as px
 
 pb_route = st.selectbox("Select Route for Price Breakdown", routes, key="pb_route")
-pb_origin, pb_dest = pb_route.split(" → ")
+pb_origin, pb_dest = pb_route.split(" â†’ ")
 pb_df = fares_df[
     (fares_df["origin"] == pb_origin) &
     (fares_df["destination"] == pb_dest) &
@@ -210,22 +210,22 @@ pb_df = fares_df[
 if pb_df.empty:
     st.warning("No Tier 1 data available for this route yet.")
 else:
-    # ── ROW 1: Key Stats ──────────────────────────────────────────────────────
-    st.subheader("📊 Key Price Statistics")
+    # â”€â”€ ROW 1: Key Stats â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    st.subheader("ðŸ“Š Key Price Statistics")
     k1, k2, k3, k4, k5 = st.columns(5)
-    k1.metric("Lowest Fare", f"₹{pb_df['price'].min():,.0f}")
-    k2.metric("Highest Fare", f"₹{pb_df['price'].max():,.0f}")
-    k3.metric("Average Fare", f"₹{pb_df['price'].mean():,.0f}")
-    k4.metric("Median Fare",  f"₹{pb_df['price'].median():,.0f}")
+    k1.metric("Lowest Fare", f"â‚¹{pb_df['price'].min():,.0f}")
+    k2.metric("Highest Fare", f"â‚¹{pb_df['price'].max():,.0f}")
+    k3.metric("Average Fare", f"â‚¹{pb_df['price'].mean():,.0f}")
+    k4.metric("Median Fare",  f"â‚¹{pb_df['price'].median():,.0f}")
     k5.metric("Total Samples", f"{len(pb_df):,}")
 
     st.divider()
 
-    # ── ROW 2: Airline Comparison + Price Distribution ─────────────────────────
+    # â”€â”€ ROW 2: Airline Comparison + Price Distribution â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     col_a, col_b = st.columns([1, 1])
 
     with col_a:
-        st.subheader("✈️ Airline-wise Price Comparison")
+        st.subheader("âœˆï¸ Airline-wise Price Comparison")
         airline_stats = (
             pb_df.groupby("airline")["price"]
             .agg(Min="min", Avg="mean", Max="max", Count="count")
@@ -245,10 +245,10 @@ else:
             color="Avg",
             color_continuous_scale="Blues",
             text="Avg",
-            labels={"airline": "Airline", "Avg": "Avg Fare (₹)"},
+            labels={"airline": "Airline", "Avg": "Avg Fare (â‚¹)"},
         )
         fig_airline.update_traces(
-            texttemplate="₹%{text:,.0f}",
+            texttemplate="â‚¹%{text:,.0f}",
             textposition="outside",
             marker_line_width=1,
             marker_line_color="white",
@@ -257,28 +257,28 @@ else:
             coloraxis_showscale=False,
             margin=dict(t=20, b=10),
             xaxis_title="Airline",
-            yaxis_title="Average Price (₹)",
+            yaxis_title="Average Price (â‚¹)",
             plot_bgcolor="rgba(0,0,0,0)",
             paper_bgcolor="rgba(0,0,0,0)",
         )
         fig_airline.add_annotation(
-            text="Error bars show Min–Max range",
+            text="Error bars show Minâ€“Max range",
             xref="paper", yref="paper",
             x=0, y=-0.18, showarrow=False,
             font=dict(size=10, color="grey"),
         )
-        st.plotly_chart(fig_airline, use_container_width=True)
+        st.plotly_chart(fig_airline, width='stretch')
         st.caption("Bar height = average fare. Error bars show the cheapest and most expensive fares seen per airline.")
 
     with col_b:
-        st.subheader("📦 Price Distribution (Box Plot)")
+        st.subheader("ðŸ“¦ Price Distribution (Box Plot)")
         fig_box = px.box(
             pb_df,
             x="airline",
             y="price",
             color="airline",
             points="all",
-            labels={"airline": "Airline", "price": "Price (₹)"},
+            labels={"airline": "Airline", "price": "Price (â‚¹)"},
             color_discrete_sequence=px.colors.qualitative.Set2,
         )
         fig_box.update_layout(
@@ -287,15 +287,15 @@ else:
             plot_bgcolor="rgba(0,0,0,0)",
             paper_bgcolor="rgba(0,0,0,0)",
             xaxis_title="Airline",
-            yaxis_title="Price (₹)",
+            yaxis_title="Price (â‚¹)",
         )
-        st.plotly_chart(fig_box, use_container_width=True)
-        st.caption("Each dot is a real fare observation. The box shows the 25th–75th percentile range. Dots outside = potential outliers.")
+        st.plotly_chart(fig_box, width='stretch')
+        st.caption("Each dot is a real fare observation. The box shows the 25thâ€“75th percentile range. Dots outside = potential outliers.")
 
     st.divider()
 
-    # ── ROW 3: Booking Window Curve ────────────────────────────────────────────
-    st.subheader("📅 How Price Changes with Days to Departure")
+    # â”€â”€ ROW 3: Booking Window Curve â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    st.subheader("ðŸ“… How Price Changes with Days to Departure")
     window_stats = (
         pb_df.groupby(["booking_window_days", "airline"])["price"]
         .mean()
@@ -308,7 +308,7 @@ else:
         y="Avg Price",
         color="airline",
         markers=True,
-        labels={"booking_window_days": "Days Before Departure", "Avg Price": "Avg Fare (₹)", "airline": "Airline"},
+        labels={"booking_window_days": "Days Before Departure", "Avg Price": "Avg Fare (â‚¹)", "airline": "Airline"},
         color_discrete_sequence=px.colors.qualitative.Bold,
     )
     fig_window.update_layout(
@@ -316,7 +316,7 @@ else:
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
         xaxis=dict(autorange="reversed", title="Days Before Departure (Higher = Further Ahead)"),
-        yaxis_title="Average Fare (₹)",
+        yaxis_title="Average Fare (â‚¹)",
     )
     fig_window.add_vrect(
         x0=0, x1=5,
@@ -330,41 +330,41 @@ else:
         annotation_text="Best booking zone",
         annotation_position="top right",
     )
-    st.plotly_chart(fig_window, use_container_width=True)
-    st.caption("Left side = last-minute booking (expensive). Right side = advance booking. Sweet spot is usually 14–30 days ahead.")
+    st.plotly_chart(fig_window, width='stretch')
+    st.caption("Left side = last-minute booking (expensive). Right side = advance booking. Sweet spot is usually 14â€“30 days ahead.")
 
     st.divider()
 
-    # ── ROW 4: Cheapest Airline Leaderboard ────────────────────────────────────
-    st.subheader("🏆 Airline Price Leaderboard (Cheapest First)")
+    # â”€â”€ ROW 4: Cheapest Airline Leaderboard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    st.subheader("ðŸ† Airline Price Leaderboard (Cheapest First)")
     leaderboard = airline_stats.sort_values("Avg")[["airline", "Min", "Avg", "Max", "Count"]].copy()
-    leaderboard.columns = ["Airline", "Cheapest Seen (₹)", "Avg Fare (₹)", "Most Expensive (₹)", "Observations"]
-    leaderboard["Cheapest Seen (₹)"] = leaderboard["Cheapest Seen (₹)"].apply(lambda x: f"₹{x:,.0f}")
-    leaderboard["Avg Fare (₹)"] = leaderboard["Avg Fare (₹)"].apply(lambda x: f"₹{x:,.0f}")
-    leaderboard["Most Expensive (₹)"] = leaderboard["Most Expensive (₹)"].apply(lambda x: f"₹{x:,.0f}")
+    leaderboard.columns = ["Airline", "Cheapest Seen (â‚¹)", "Avg Fare (â‚¹)", "Most Expensive (â‚¹)", "Observations"]
+    leaderboard["Cheapest Seen (â‚¹)"] = leaderboard["Cheapest Seen (â‚¹)"].apply(lambda x: f"â‚¹{x:,.0f}")
+    leaderboard["Avg Fare (â‚¹)"] = leaderboard["Avg Fare (â‚¹)"].apply(lambda x: f"â‚¹{x:,.0f}")
+    leaderboard["Most Expensive (â‚¹)"] = leaderboard["Most Expensive (â‚¹)"].apply(lambda x: f"â‚¹{x:,.0f}")
 
     # Highlight cheapest airline
     cheapest = leaderboard.iloc[0]["Airline"]
-    st.success(f"✅ **Cheapest airline on {pb_route}:** {cheapest} (based on {len(pb_df)} real scraped fares)")
-    st.dataframe(leaderboard, use_container_width=True, hide_index=True)
+    st.success(f"âœ… **Cheapest airline on {pb_route}:** {cheapest} (based on {len(pb_df)} real scraped fares)")
+    st.dataframe(leaderboard, width='stretch', hide_index=True)
 
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # SECTION 4: CPI CALCULATOR
-# ─────────────────────────────────────────────────────────────────────────────
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 st.divider()
 
-st.header("🧮 Airfare CPI Calculator")
+st.header("ðŸ§® Airfare CPI Calculator")
 st.markdown(
     """
-    **Formula (Laspeyres Fixed-Basket Index — same methodology as India's official CPI):**
+    **Formula (Laspeyres Fixed-Basket Index â€” same methodology as India's official CPI):**
 
-    > `Airfare CPI = 100 × (Current Avg Fare) ÷ (Base Period Avg Fare)`
+    > `Airfare CPI = 100 Ã— (Current Avg Fare) Ã· (Base Period Avg Fare)`
 
     | Term | Meaning |
     |---|---|
     | **Base Period** | Earliest date with cleaned data for a route. CPI = 100 on this date. |
-    | **CPI > 100** | Fares have risen → Airfare **Inflation** 📈 |
-    | **CPI < 100** | Fares have fallen → Airfare **Deflation** 📉 |
+    | **CPI > 100** | Fares have risen â†’ Airfare **Inflation** ðŸ“ˆ |
+    | **CPI < 100** | Fares have fallen â†’ Airfare **Deflation** ðŸ“‰ |
     | **National CPI** | Weighted average of all route CPIs (weight = observation count as proxy for passenger volume) |
     """
 )
@@ -372,10 +372,10 @@ st.markdown(
 cpi_col1, cpi_col2 = st.columns([1, 1])
 
 with cpi_col1:
-    st.subheader("📍 Route-Level CPI")
+    st.subheader("ðŸ“ Route-Level CPI")
 
     cpi_route = st.selectbox("Select Route for CPI", routes, key="cpi_route")
-    origin_c, dest_c = cpi_route.split(" → ")
+    origin_c, dest_c = cpi_route.split(" â†’ ")
     route_data = fares_df[(fares_df["origin"] == origin_c) & (fares_df["destination"] == dest_c)]
 
     if route_data.empty:
@@ -403,23 +403,23 @@ with cpi_col1:
             # Show the formula worked out step-by-step
             st.markdown("**Formula Breakdown:**")
             st.code(
-                f"Base Period  : {base_date}  →  Avg Fare = ₹{base_price:,.0f}\n"
-                f"Current Date : {latest_date}  →  Avg Fare = ₹{current_price:,.0f}\n"
-                f"\nCPI = 100 × {current_price:,.0f} ÷ {base_price:,.0f} = {cpi_value:.2f}",
+                f"Base Period  : {base_date}  â†’  Avg Fare = â‚¹{base_price:,.0f}\n"
+                f"Current Date : {latest_date}  â†’  Avg Fare = â‚¹{current_price:,.0f}\n"
+                f"\nCPI = 100 Ã— {current_price:,.0f} Ã· {base_price:,.0f} = {cpi_value:.2f}",
                 language="text",
             )
 
             if delta > 0.01:
-                st.error(f"🔴 Airfare INFLATION of {delta:.2f}% detected on this route since base period.")
+                st.error(f"ðŸ”´ Airfare INFLATION of {delta:.2f}% detected on this route since base period.")
             elif delta < -0.01:
-                st.success(f"🟢 Airfare DEFLATION of {abs(delta):.2f}% detected on this route since base period.")
+                st.success(f"ðŸŸ¢ Airfare DEFLATION of {abs(delta):.2f}% detected on this route since base period.")
             else:
-                st.info("⚪ Fares are stable — no meaningful change from base period.")
+                st.info("âšª Fares are stable â€” no meaningful change from base period.")
         else:
             st.warning("Cannot compute CPI: base price is zero or missing.")
 
 with cpi_col2:
-    st.subheader("🇮🇳 National Aggregate Airfare CPI")
+    st.subheader("ðŸ‡®ðŸ‡³ National Aggregate Airfare CPI")
 
     national_rows = []
     for (origin, dest), grp in fares_df.groupby(["origin", "destination"]):
@@ -431,9 +431,9 @@ with cpi_col2:
         if base_p > 0 and not pd.isna(base_p) and not pd.isna(curr_p):
             cpi_val = 100.0 * curr_p / base_p
             national_rows.append({
-                "route": f"{origin} → {dest}",
-                "Base Fare (₹)": round(base_p, 2),
-                "Current Fare (₹)": round(curr_p, 2),
+                "route": f"{origin} â†’ {dest}",
+                "Base Fare (â‚¹)": round(base_p, 2),
+                "Current Fare (â‚¹)": round(curr_p, 2),
                 "CPI": round(cpi_val, 2),
                 "Obs. Count (Weight)": n,
                 "_cpi_raw": cpi_val,
@@ -454,8 +454,8 @@ with cpi_col2:
         )
 
         st.markdown("**Route-wise CPI Breakdown:**")
-        display_df = nat_df[["route", "Base Fare (₹)", "Current Fare (₹)", "CPI", "Obs. Count (Weight)"]].copy()
-        st.dataframe(display_df, use_container_width=True, hide_index=True)
+        display_df = nat_df[["route", "Base Fare (â‚¹)", "Current Fare (â‚¹)", "CPI", "Obs. Count (Weight)"]].copy()
+        st.dataframe(display_df, width='stretch', hide_index=True)
 
         st.markdown("**Route CPI Bar Chart:**")
         import plotly.express as px
@@ -486,17 +486,17 @@ with cpi_col2:
         # Add a baseline at 100 to clearly show inflation vs deflation
         fig_bar.add_hline(y=100, line_dash="dash", line_color="white", annotation_text="Base Price (100)", annotation_position="bottom right")
         
-        st.plotly_chart(fig_bar, use_container_width=True)
+        st.plotly_chart(fig_bar, width='stretch')
 
         if nat_delta > 0.01:
-            st.error(f"🔴 National airfare is {nat_delta:.2f}% ABOVE the base period — overall inflation signal.")
+            st.error(f"ðŸ”´ National airfare is {nat_delta:.2f}% ABOVE the base period â€” overall inflation signal.")
         elif nat_delta < -0.01:
-            st.success(f"🟢 National airfare is {abs(nat_delta):.2f}% BELOW the base period — overall deflation signal.")
+            st.success(f"ðŸŸ¢ National airfare is {abs(nat_delta):.2f}% BELOW the base period â€” overall deflation signal.")
         else:
-            st.info("⚪ National airfare is stable at the base level.")
+            st.info("âšª National airfare is stable at the base level.")
             
         st.divider()
-        st.subheader("🏛️ Official MoSPI Benchmark (Airfare)")
+        st.subheader("ðŸ›ï¸ Official MoSPI Benchmark (Airfare)")
         if not official_cpi_df.empty:
             latest_official = official_cpi_df.sort_values(["year", "month"]).iloc[-1]
             st.markdown(f"**Latest official data point ({latest_official['month']} {latest_official['year']})**")
@@ -522,6 +522,7 @@ with cpi_col2:
 
 st.caption(
     "Anomaly flags are surfaced by anomaly.py's log output for this prototype "
-    "(see docs/DESIGN_hackathon_prototype.md §5) rather than a table here — "
+    "(see docs/DESIGN_hackathon_prototype.md Â§5) rather than a table here â€” "
     "run `python anomaly.py` alongside the dashboard during a demo."
 )
+
