@@ -191,9 +191,168 @@ st.dataframe(
 )
 
 # ─────────────────────────────────────────────────────────────────────────────
-# SECTION 3: CPI CALCULATOR
+# SECTION 3: PRICE BREAKDOWN
 # ─────────────────────────────────────────────────────────────────────────────
 st.divider()
+st.header("💰 Price Breakdown Analysis")
+st.markdown("Detailed fare analysis by airline, booking window, and price distribution for any route.")
+
+import plotly.express as px
+
+pb_route = st.selectbox("Select Route for Price Breakdown", routes, key="pb_route")
+pb_origin, pb_dest = pb_route.split(" → ")
+pb_df = fares_df[
+    (fares_df["origin"] == pb_origin) &
+    (fares_df["destination"] == pb_dest) &
+    (fares_df["source_tier"] == "tier1_google_flights")
+].copy()
+
+if pb_df.empty:
+    st.warning("No Tier 1 data available for this route yet.")
+else:
+    # ── ROW 1: Key Stats ──────────────────────────────────────────────────────
+    st.subheader("📊 Key Price Statistics")
+    k1, k2, k3, k4, k5 = st.columns(5)
+    k1.metric("Lowest Fare", f"₹{pb_df['price'].min():,.0f}")
+    k2.metric("Highest Fare", f"₹{pb_df['price'].max():,.0f}")
+    k3.metric("Average Fare", f"₹{pb_df['price'].mean():,.0f}")
+    k4.metric("Median Fare",  f"₹{pb_df['price'].median():,.0f}")
+    k5.metric("Total Samples", f"{len(pb_df):,}")
+
+    st.divider()
+
+    # ── ROW 2: Airline Comparison + Price Distribution ─────────────────────────
+    col_a, col_b = st.columns([1, 1])
+
+    with col_a:
+        st.subheader("✈️ Airline-wise Price Comparison")
+        airline_stats = (
+            pb_df.groupby("airline")["price"]
+            .agg(Min="min", Avg="mean", Max="max", Count="count")
+            .reset_index()
+            .sort_values("Avg")
+        )
+        airline_stats["Avg"] = airline_stats["Avg"].round(0)
+        airline_stats["Min"] = airline_stats["Min"].round(0)
+        airline_stats["Max"] = airline_stats["Max"].round(0)
+
+        fig_airline = px.bar(
+            airline_stats,
+            x="airline",
+            y="Avg",
+            error_y=airline_stats["Max"] - airline_stats["Avg"],
+            error_y_minus=airline_stats["Avg"] - airline_stats["Min"],
+            color="Avg",
+            color_continuous_scale="Blues",
+            text="Avg",
+            labels={"airline": "Airline", "Avg": "Avg Fare (₹)"},
+        )
+        fig_airline.update_traces(
+            texttemplate="₹%{text:,.0f}",
+            textposition="outside",
+            marker_line_width=1,
+            marker_line_color="white",
+        )
+        fig_airline.update_layout(
+            coloraxis_showscale=False,
+            margin=dict(t=20, b=10),
+            xaxis_title="Airline",
+            yaxis_title="Average Price (₹)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            paper_bgcolor="rgba(0,0,0,0)",
+        )
+        fig_airline.add_annotation(
+            text="Error bars show Min–Max range",
+            xref="paper", yref="paper",
+            x=0, y=-0.18, showarrow=False,
+            font=dict(size=10, color="grey"),
+        )
+        st.plotly_chart(fig_airline, use_container_width=True)
+        st.caption("Bar height = average fare. Error bars show the cheapest and most expensive fares seen per airline.")
+
+    with col_b:
+        st.subheader("📦 Price Distribution (Box Plot)")
+        fig_box = px.box(
+            pb_df,
+            x="airline",
+            y="price",
+            color="airline",
+            points="all",
+            labels={"airline": "Airline", "price": "Price (₹)"},
+            color_discrete_sequence=px.colors.qualitative.Set2,
+        )
+        fig_box.update_layout(
+            showlegend=False,
+            margin=dict(t=20, b=10),
+            plot_bgcolor="rgba(0,0,0,0)",
+            paper_bgcolor="rgba(0,0,0,0)",
+            xaxis_title="Airline",
+            yaxis_title="Price (₹)",
+        )
+        st.plotly_chart(fig_box, use_container_width=True)
+        st.caption("Each dot is a real fare observation. The box shows the 25th–75th percentile range. Dots outside = potential outliers.")
+
+    st.divider()
+
+    # ── ROW 3: Booking Window Curve ────────────────────────────────────────────
+    st.subheader("📅 How Price Changes with Days to Departure")
+    window_stats = (
+        pb_df.groupby(["booking_window_days", "airline"])["price"]
+        .mean()
+        .reset_index()
+        .rename(columns={"price": "Avg Price"})
+    )
+    fig_window = px.line(
+        window_stats,
+        x="booking_window_days",
+        y="Avg Price",
+        color="airline",
+        markers=True,
+        labels={"booking_window_days": "Days Before Departure", "Avg Price": "Avg Fare (₹)", "airline": "Airline"},
+        color_discrete_sequence=px.colors.qualitative.Bold,
+    )
+    fig_window.update_layout(
+        margin=dict(t=20, b=10),
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        xaxis=dict(autorange="reversed", title="Days Before Departure (Higher = Further Ahead)"),
+        yaxis_title="Average Fare (₹)",
+    )
+    fig_window.add_vrect(
+        x0=0, x1=5,
+        fillcolor="red", opacity=0.07,
+        annotation_text="Last-minute zone",
+        annotation_position="top left",
+    )
+    fig_window.add_vrect(
+        x0=20, x1=35,
+        fillcolor="green", opacity=0.07,
+        annotation_text="Best booking zone",
+        annotation_position="top right",
+    )
+    st.plotly_chart(fig_window, use_container_width=True)
+    st.caption("Left side = last-minute booking (expensive). Right side = advance booking. Sweet spot is usually 14–30 days ahead.")
+
+    st.divider()
+
+    # ── ROW 4: Cheapest Airline Leaderboard ────────────────────────────────────
+    st.subheader("🏆 Airline Price Leaderboard (Cheapest First)")
+    leaderboard = airline_stats.sort_values("Avg")[["airline", "Min", "Avg", "Max", "Count"]].copy()
+    leaderboard.columns = ["Airline", "Cheapest Seen (₹)", "Avg Fare (₹)", "Most Expensive (₹)", "Observations"]
+    leaderboard["Cheapest Seen (₹)"] = leaderboard["Cheapest Seen (₹)"].apply(lambda x: f"₹{x:,.0f}")
+    leaderboard["Avg Fare (₹)"] = leaderboard["Avg Fare (₹)"].apply(lambda x: f"₹{x:,.0f}")
+    leaderboard["Most Expensive (₹)"] = leaderboard["Most Expensive (₹)"].apply(lambda x: f"₹{x:,.0f}")
+
+    # Highlight cheapest airline
+    cheapest = leaderboard.iloc[0]["Airline"]
+    st.success(f"✅ **Cheapest airline on {pb_route}:** {cheapest} (based on {len(pb_df)} real scraped fares)")
+    st.dataframe(leaderboard, use_container_width=True, hide_index=True)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SECTION 4: CPI CALCULATOR
+# ─────────────────────────────────────────────────────────────────────────────
+st.divider()
+
 st.header("🧮 Airfare CPI Calculator")
 st.markdown(
     """
