@@ -90,6 +90,11 @@ def _to_observations(result, origin: str, destination: str, departure_date: date
         # installed version differs (see module docstring).
         price_raw = getattr(f, "price", None)
         price = _parse_price(price_raw)
+        # ── PERMANENT USD GUARD ──────────────────────────────────────────────
+        # Converts suspiciously-low prices that indicate Google returned USD
+        # instead of INR (happens on US-located cloud servers).
+        price = _sanitise_price(price, origin, destination)
+        # ─────────────────────────────────────────────────────────────────────
         airlines = getattr(f, "airlines", [])
         airline = airlines[0] if airlines else (getattr(f, "name", "") or getattr(f, "airline", "") or "")
 
@@ -113,17 +118,47 @@ def _to_observations(result, origin: str, destination: str, departure_date: date
     return rows
 
 
+# Minimum realistic economy fare on ANY Indian domestic route (INR).
+# No seat exists below this — if we get a value lower, it is USD from a
+# US-located cloud server. We convert it using a conservative rate.
+_MIN_INR_PRICE = 500
+_USD_TO_INR_APPROX = 84.0   # update yearly if needed
+
+
 def _parse_price(price_raw) -> float | None:
     if price_raw is None:
         return None
     if isinstance(price_raw, (int, float)):
         return float(price_raw)
-    # fast-flights often returns a formatted string like "₹4,521"
+    # fast-flights often returns a formatted string like "₹4,521" or "$93"
+    # Strip all non-numeric characters except decimal point
     digits = "".join(ch for ch in str(price_raw) if ch.isdigit() or ch == ".")
     try:
         return float(digits) if digits else None
     except ValueError:
         return None
+
+
+def _sanitise_price(price: float | None, origin: str, destination: str) -> float | None:
+    """Permanent USD guard.
+
+    Google Flights on US-based servers (GitHub Actions) sometimes ignores the
+    currency='INR' parameter and returns prices in USD.  No legitimate Indian
+    domestic economy fare is below _MIN_INR_PRICE (Rs 500).  If we receive a
+    price below that floor we assume it is USD and convert it.  A log WARNING
+    is emitted every time so the issue is always visible in the pipeline logs.
+    """
+    if price is None:
+        return None
+    if price < _MIN_INR_PRICE:
+        converted = round(price * _USD_TO_INR_APPROX)
+        logger.warning(
+            "CURRENCY GUARD triggered for %s->%s: received %.0f (looks like USD). "
+            "Converting to INR: %.0f x %.0f = %.0f INR",
+            origin, destination, price, price, _USD_TO_INR_APPROX, converted,
+        )
+        return float(converted)
+    return price
 
 
 def run_once(routes=None, windows=None) -> int:
