@@ -37,6 +37,28 @@ import config
 
 logger = logging.getLogger("sih26056.storage")
 
+# ─── Permanent USD guard ───────────────────────────────────────────────────
+# No legitimate Indian domestic economy fare is below Rs 500.
+# Google Flights on US-based servers (GitHub Actions) returns prices in USD
+# despite currency='INR' being requested.  We catch and convert here at the
+# storage layer so ALL collectors (tier0/tier1/tier2) are protected.
+_INR_FLOOR = 500          # Rs — no real domestic seat is cheaper than this
+_USD_TO_INR = 84.0        # conservative exchange rate; update annually
+
+
+def _sanitise_row(row: "FareObservation") -> "FareObservation":
+    """Convert any suspiciously-low price (USD) to INR in-place."""
+    if row.price is not None and row.price < _INR_FLOOR:
+        converted = round(row.price * _USD_TO_INR)
+        logger.warning(
+            "[STORAGE USD GUARD] %s->%s | airline=%s | received=%.0f (USD?) "
+            "| converted to INR: %.0f x %.0f = %d",
+            row.origin, row.destination, row.airline,
+            row.price, row.price, _USD_TO_INR, converted,
+        )
+        row.price = float(converted)
+    return row
+
 
 @dataclass
 class FareObservation:
@@ -118,7 +140,13 @@ def write_postgres(rows: list[FareObservation]) -> int:
 
 
 def persist(rows: list[FareObservation]) -> int:
-    """Single entry point every collector should call."""
+    """Single entry point every collector should call.
+
+    Applies USD -> INR guard before writing so no collector can ever
+    persist a USD-denominated price regardless of where it runs.
+    """
+    # Apply currency guard to EVERY row before any write path
+    sanitised = [_sanitise_row(r) for r in rows]
     if config.DATABASE_URL:
-        return write_postgres(rows)
-    return write_csv(rows)
+        return write_postgres(sanitised)
+    return write_csv(sanitised)
