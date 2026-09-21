@@ -16,3 +16,4 @@ fastapi>=0.111                 # Stage 6 API
 uvicorn>=0.29                    # Stage 6 API server
 plotly>=5.20                       # optional, nicer dashboard charts
 schedule>=1.2.0                    # Smart Automation scheduling
+amadeus>=9.0.0                     # Amadeus API SDK

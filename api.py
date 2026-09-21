@@ -22,9 +22,20 @@ from sqlalchemy import text
 
 from db import get_engine
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(
     title="AirPrice India — Index API (prototype)",
     description="SIH26056 internal hackathon prototype. Not production-hardened.",
+)
+
+# Add CORS Middleware to allow the Next.js frontend on Vercel to access the API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # For production, change to your exact Vercel URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 

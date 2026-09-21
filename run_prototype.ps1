@@ -5,6 +5,9 @@ Write-Host "Activating venv..."
 Write-Host "Running Tier 1 (Google Flights)..."
 python collector_tier1.py
 
+Write-Host "Running Tier 1 (Amadeus API)..."
+python collector_amadeus.py
+
 Write-Host "Running Tier 0 (DGCA Mock)..."
 python collector_tier0_dgca.py
 
