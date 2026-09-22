@@ -34,12 +34,12 @@ st.set_page_config(page_title="Aerofare | Executive Suite", layout="wide", initi
 
 st.markdown("""
     <style>
-    /* Executive Obsidian Dark Theme - Bento Box Architecture */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    /* Professional Vibrant Light Theme - Bento Box Architecture */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
     .stApp { 
-        background-color: #0E1117;
-        color: #E6EDF3; 
+        background-color: #f1f5f9;
+        color: #1e293b; 
         font-family: 'Inter', sans-serif;
     }
     
@@ -51,60 +51,66 @@ st.markdown("""
     }
     
     /* Main Headers */
-    h1, h2, h3, h4 { color: #FFFFFF !important; font-weight: 700 !important; }
+    h1, h2, h3, h4 { color: #0f172a !important; font-weight: 800 !important; }
     h1 {
         font-size: 32px !important;
         letter-spacing: -0.5px;
         margin-bottom: 24px !important;
-        border-bottom: 1px solid #30363D;
+        border-bottom: 3px solid transparent;
+        border-image: linear-gradient(to right, #3b82f6, #8b5cf6, #ec4899) 1;
         padding-bottom: 12px;
+        text-transform: uppercase;
     }
     
     /* Bento Box Containers */
     div[data-testid="stVerticalBlock"] > div > div {
-        background-color: #161B22;
-        border: 1px solid #30363D;
-        border-radius: 12px;
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
         padding: 16px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     }
     
     /* Metrics */
     div[data-testid="stMetricValue"] { 
-        color: #00FFCC !important; 
-        font-weight: 700 !important; 
-        font-size: 28px !important; 
+        color: #4338ca !important; /* Deep Indigo */
+        font-weight: 800 !important; 
+        font-size: 32px !important; 
         font-family: 'Inter', monospace;
     }
-    div[data-testid="stMetricDelta"] { color: #00D2FF !important; font-weight: 600 !important; }
+    div[data-testid="stMetricDelta"] { color: #059669 !important; font-weight: 700 !important; } /* Emerald */
     
     /* Executive Tabs */
     .stTabs [data-baseweb="tab-list"] { 
         gap: 8px; 
-        border-bottom: 1px solid #30363D; 
+        border-bottom: 1px solid #cbd5e1; 
     }
     .stTabs [data-baseweb="tab"] { 
-        background-color: #161B22 !important; 
-        border-radius: 8px 8px 0px 0px !important; 
+        background-color: #e2e8f0 !important; 
+        border-radius: 6px 6px 0px 0px !important; 
         padding: 12px 24px; 
-        color: #8B949E !important;
-        font-weight: 600;
+        color: #475569 !important;
+        font-weight: 700;
         border: 1px solid transparent;
         border-bottom: none;
+        text-transform: uppercase;
+        font-size: 13px;
+        letter-spacing: 0.5px;
     }
     .stTabs [aria-selected="true"] { 
-        color: #00FFCC !important; 
-        background-color: #21262D !important;
-        border: 1px solid #30363D !important;
-        border-bottom: 1px solid #21262D !important;
+        color: #4338ca !important; 
+        background-color: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        border-top: 4px solid #8b5cf6 !important; /* Vibrant Violet */
+        border-bottom: 1px solid #ffffff !important;
         margin-bottom: -1px;
     }
     
     /* Text Input */
     .stTextInput input {
-        background-color: #0E1117 !important;
-        color: #E6EDF3 !important;
-        border: 1px solid #30363D !important;
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important;
         border-radius: 6px !important;
     }
     </style>
