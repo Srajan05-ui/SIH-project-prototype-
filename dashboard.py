@@ -4,6 +4,19 @@ import numpy as np
 from datetime import datetime, timedelta
 
 # Defensively import modules
+# Defensively import modules with robust fallbacks
+class MockLedger:
+    def record_transaction(self, *args): pass
+    def record_block(self, *args): pass
+    def validate_ledger(self): return False, "Ledger module offline (Dependency missing)"
+    
+class MockRAG:
+    def add_context(self, *args): pass
+    def query(self, *args): return "RAG module offline (Dependency missing)"
+
+class MockXAI:
+    def fit(self, *args): pass
+
 try:
     from index_chain_calc import IndexCalculator
     from market_concentration import MarketConcentration
@@ -13,6 +26,9 @@ try:
     from local_rag_desk import LocalRAGDesk
 except ImportError:
     pass
+    XAIAnomalyEngine = MockXAI
+    LedgerAudit = MockLedger
+    LocalRAGDesk = MockRAG
 
 st.set_page_config(page_title="Aerofare | Executive Suite", layout="wide", initial_sidebar_state="collapsed")
 
