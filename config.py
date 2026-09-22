@@ -10,6 +10,18 @@ from dotenv import load_dotenv
 
 load_dotenv()  # picks up a local .env if present; harmless if it isn't
 
+# --- Streamlit Cloud secrets fallback ------------------------------------
+# On Streamlit Community Cloud, secrets are injected via st.secrets (TOML).
+# We merge them into os.environ so the rest of config.py stays unchanged.
+try:
+    import streamlit as st
+    _secrets = st.secrets.to_dict()
+    for _k, _v in _secrets.items():
+        if isinstance(_v, str) and _k not in os.environ:
+            os.environ[_k] = _v
+except Exception:
+    pass  # not running under Streamlit, or streamlit not installed — no-op
+
 # --- Routes (Tier 1 backbone, per brief §7 "Phase 1" and §6.2) -------------
 # (origin, destination) IATA codes. Kept to the three the brief names so the
 # very first run finishes fast; add more once this is stable.
@@ -47,6 +59,10 @@ CSV_PATH = os.path.join(DATA_DIR, "fare_observations.csv")
 # collector writes to Postgres/TimescaleDB instead of CSV. Unset = CSV.
 DATABASE_URL = os.environ.get("DATABASE_URL", "").strip() or None
 
+# --- Amadeus API -----------------------------------------------------------
+AMADEUS_API_KEY = os.environ.get("AMADEUS_API_KEY", "").strip() or None
+AMADEUS_API_SECRET = os.environ.get("AMADEUS_API_SECRET", "").strip() or None
+
 # --- Identification (brief §5.2 "Identify ourselves") ----------------------
 PROJECT_USER_AGENT_NOTE = (
     "SIH26056-airfare-index-prototype "
@@ -56,3 +72,4 @@ PROJECT_USER_AGENT_NOTE = (
 # --- Logging ---------------------------------------------------------------
 LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
 LOG_FILE = os.path.join(LOG_DIR, "collector.log")
+
