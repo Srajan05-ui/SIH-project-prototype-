@@ -118,31 +118,6 @@ st.markdown("""
 
 st.title("🦅 Aerofare: National Airfare Intelligence")
 
-# --- Security: Authentication Gateway ---
-def check_password():
-    """Returns `True` if the user has the correct password."""
-    def password_entered():
-        # In a real production environment, use hashed passwords or SSO/OAuth.
-        # For this prototype, we check against a hardcoded secure string or st.secrets.
-        if st.session_state["admin_password"] == "SecureAdmin2026!":
-            st.session_state["password_correct"] = True
-            del st.session_state["admin_password"]  # Clear from session state immediately
-        else:
-            st.session_state["password_correct"] = False
-
-    if st.session_state.get("password_correct", False):
-        return True
-
-    st.markdown("### 🔒 Unauthorized Access Prohibited")
-    st.markdown("Please authenticate to access the Executive Suite.")
-    st.text_input("Administrator Password", type="password", on_change=password_entered, key="admin_password")
-    
-    if "password_correct" in st.session_state and not st.session_state["password_correct"]:
-        st.error("🚫 Invalid credentials.")
-    return False
-
-if not check_password():
-    st.stop() # Halts all execution if not authenticated
 
 # --- Init Session States securely ---
 if 'ledger' not in st.session_state:
